@@ -1,6 +1,20 @@
 import { gsap } from "gsap";
 
 export function entry() {
+
+  const topAnimate = () => {
+    const tl = gsap.timeline()
+    tl.from(".oval",{
+      opacity: 0,
+      xPercent: -100,
+      stagger: .2,
+    })
+    .from(".ball", {
+      opacity: 0
+    })
+    return tl
+  }
+
   const tl = gsap.timeline()
   tl.from(".wave", {
     x: -20
@@ -22,4 +36,5 @@ export function entry() {
       entry.classList.add("d-none")
     }
   })
+  .add(topAnimate())
 }
