@@ -1,0 +1,74 @@
+@import 'mixin'
+h1
+  position: absolute
+  top: 0
+  left: 0
+  width: 0
+  height: 0
+  opacity: 0
+
+.navbar
+  padding: 55px 100px 0
+  position: fixed
+  min-height: 115px
+  top: 0
+  left: 0
+  z-index: 10
+  display: flex
+  display: none
+  justify-content: space-between
+  align-items: center
+  width: 100vw
+  +rwdmax(575)
+    padding: 30px 25px 0
+    min-height: 75px
+.logo-link
+  display: block
+  max-height: 60px
+  .logo
+    display: block
+    height: 60px
+  &:hover
+    .wave
+      animation: scaleBigger 3s ease-in-out infinite
+      +rwdmax(575)
+        animation: none
+  +rwdmax(575)
+    .logo
+      height: 45px
+    .wave
+      transform: scale(1.4)
+      
+    .chinese, .letter
+      display: none
+.menu-wrap
+  width: 45px
+  cursor: pointer
+  .burger
+    margin: 0 auto
+    width: 40px
+    height: 16px
+    &::before, &::after
+        content: ''
+        display: block
+        width: 100%
+        height: 2px
+        background: #fff
+    &::before
+      margin-bottom: 5px
+    &::after
+      width: 20px
+      margin: 5px 0 0 auto
+      transition: transform .4s ease-out
+    >span
+      display: block
+      width: 100%
+      height: 2px
+      background: #fff
+  >p
+    margin-top: 10px
+    font-size: 15px
+    letter-spacing: 0.5px
+  &:hover
+    .burger::after
+      transform: translateX(-20px)
