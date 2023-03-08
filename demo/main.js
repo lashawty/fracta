@@ -12,7 +12,7 @@ entry()
 
 //加入物理世界
 const world = new CANNON.World()
-world.gravity.set(0, -1, 0) //地心引力
+world.gravity.set(0, 0, 0) //地心引力
 
 //物理 材質
 const defaultMaterial = new CANNON.Material('default')
@@ -74,6 +74,26 @@ const createSphere = (radius, position) =>
       mesh: mesh,
       body: body
   })
+
+    // Iterate over each object in the array
+    objectsToUpdate.forEach(obj => {
+  // Use GSAP's to() method to tween the position property
+  gsap.to(obj.mesh.position, {
+    x: 0,
+    y: 0,
+    z: 0,
+    duration: 1, // Set the duration of the animation to 1 second
+    delay: 3
+  });
+
+  // gsap.to(obj.body.position, {
+  //   x: 0,
+  //   y: 0,
+  //   z: 0,
+  //   duration: 1
+  // });
+});
+
 }
 
 //物理地板
