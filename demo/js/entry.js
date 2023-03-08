@@ -1,7 +1,6 @@
 import { gsap } from "gsap";
 
 export function entry() {
-
   const topAnimate = () => {
     const tl = gsap.timeline()
     tl.from(".oval",{

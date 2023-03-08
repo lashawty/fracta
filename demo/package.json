@@ -14,8 +14,12 @@
   },
   "dependencies": {
     "cannon": "^0.6.2",
+    "cannon-es": "^0.20.0",
     "gsap": "^3.11.4",
+    "install": "^0.13.0",
     "lil-gui": "^0.18.0",
+    "matter-js": "^0.19.0",
+    "npm": "^9.6.0",
     "three": "^0.150.1"
   }
 }
