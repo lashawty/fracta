@@ -6,13 +6,13 @@ import gsap from 'gsap'
 import CANNON from 'cannon'
 
 //進場動畫
-entry()
+// entry()
 
 //下方動畫
 
 //加入物理世界
 const world = new CANNON.World()
-world.gravity.set(0, -9, 0) //地心引力
+world.gravity.set(0, -3, 0) //地心引力
 
 //物理 材質
 const defaultMaterial = new CANNON.Material('default')
@@ -21,7 +21,7 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
     defaultMaterial,
     {
         friction: 0.1,
-        restitution: .5
+        restitution: .1
     }
 )
 world.addContactMaterial(defaultContactMaterial)
@@ -41,7 +41,7 @@ const scene = new THREE.Scene()
 //球
 const objectsToUpdate = []
 const sphereGeometry = new THREE.SphereGeometry(1, 32, 32)
-const sphereMaterial = new THREE.MeshBasicMaterial({
+const sphereMaterial = new THREE.MeshPhongMaterial({
   color: '#003F97',
 })
 
@@ -67,7 +67,7 @@ const createSphere = (radius, position) =>
 
     body.position.copy(position)
     world.addBody(body)
-    body.applyLocalForce(new CANNON.Vec3(150, 0, 0), new CANNON.Vec3(-150, 0, 0))
+    body.applyLocalForce(new CANNON.Vec3(0, 0, 10), new CANNON.Vec3(100, -100, 10))
 
     //更新陣列
     objectsToUpdate.push({
@@ -78,35 +78,55 @@ const createSphere = (radius, position) =>
 
 //物理地板
 const floorShape = new CANNON.Plane()
+const boxShape = new CANNON.Box(new CANNON.Vec3(1,1000,1))
 
 const floorBody = new CANNON.Body()
 const secFloorBody = new CANNON.Body()
 const thirdFloorBody = new CANNON.Body()
+const fourFloorBody = new CANNON.Body()
+const fifFloorBody = new CANNON.Body()
+const boxBody = new CANNON.Body()
 
 floorBody.addShape(floorShape)
 secFloorBody.addShape(floorShape)
 thirdFloorBody.addShape(floorShape)
+fourFloorBody.addShape(floorShape)
+fifFloorBody.addShape(floorShape)
+boxBody.addShape(boxShape)
 
-thirdFloorBody.mass = 0
-secFloorBody.mass = 0
-floorBody.mass = 0
-
+floorBody.mass = 1
+secFloorBody.mass = 1
+thirdFloorBody.mass = 1
+fourFloorBody.mass = 1
+fifFloorBody.mass = 1
 
 world.addBody(floorBody)
 world.addBody(secFloorBody)
-// world.addBody(thirdFloorBody)
+world.addBody(thirdFloorBody)
+world.addBody(fourFloorBody)
+world.addBody(fifFloorBody)
+world.addBody(boxBody)
 
 floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5)
 secFloorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), Math.PI * .5 )
-thirdFloorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), Math.PI * .5 )
+thirdFloorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), Math.PI * - .5 )
+fourFloorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, -1, 0), Math.PI * - .5 )
 
-// floorBody.position.y = 10
-// secFloorBody.position.y = -10
-// floorBody.position.x = 0
+floorBody.position.y = -6
+secFloorBody.position.y = 6
+thirdFloorBody.position.x = 10
+fourFloorBody.position.x = -1
+fifFloorBody.position.z = -30
+boxBody.position.z = 10
+
 floorBody.material = defaultMaterial
 secFloorBody.material = defaultMaterial
 thirdFloorBody.material = defaultMaterial
-thirdFloorBody.position.x = -10
+fourFloorBody.material = defaultMaterial
+fifFloorBody.material = defaultMaterial
+
+
+
 // Lights
 const directionalLight = new THREE.DirectionalLight('#ffffff', 1)
 directionalLight.position.set(1,2,0)
@@ -163,7 +183,7 @@ const tick = () =>
     {
         object.mesh.position.copy(object.body.position)
     }
-    createSphere(renderNumber(1,0.1,0.01), { x:renderNumber(1,-1,0.1), y: 3, z: 0})
+    createSphere(renderNumber(1,0.1,0.01), { x:renderNumber(1,-1,0.1), y: 10, z: -10})
     // Render
     renderer.render(scene, camera)
 
@@ -171,7 +191,7 @@ const tick = () =>
     window.requestAnimationFrame(tick)
 }
 
-// tick()
+tick()
 const bottomAnimate = () => {
   const tl = gsap.timeline()
   tl.from(".cone-line",{
@@ -179,11 +199,25 @@ const bottomAnimate = () => {
     opacity: 0,
     xPercent: 100,
     stagger: .1,
-    delay: 5,
+    // delay: 5,
     onComplete: self => {
-      tick()
-      tl.reverse()
+      // floorBody.position.y = -20
+      // tick()
+      // tl.reverse()
     },
+  })
+  .to(boxBody.position, {
+    z: -30,
+  })
+  .to(fourFloorBody.position,{
+    x: -10
+  })
+  .to(thirdFloorBody.position,{
+    x: 0,
+    onComplete: self=>{
+      world.remove(boxBody)
+      world.gravity.set(15, 1, 10)
+    }
   })
   return tl
 }
