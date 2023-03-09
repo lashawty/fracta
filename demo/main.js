@@ -12,7 +12,7 @@ entry()
 
 //加入物理世界
 const world = new CANNON.World()
-world.gravity.set(0, 0, 0) //地心引力
+world.gravity.set(0, -9, 0) //地心引力
 
 //物理 材質
 const defaultMaterial = new CANNON.Material('default')
@@ -21,7 +21,7 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
     defaultMaterial,
     {
         friction: 0.1,
-        restitution: 0.7
+        restitution: .5
     }
 )
 world.addContactMaterial(defaultContactMaterial)
@@ -48,7 +48,7 @@ const sphereMaterial = new THREE.MeshBasicMaterial({
 //產生球
 const createSphere = (radius, position) =>
 {   
-    if (objectsToUpdate.length >= 20) return
+    if (objectsToUpdate.length >= 10) return
     // Three
     const mesh = new THREE.Mesh(sphereGeometry, sphereMaterial)
     mesh.scale.set(radius, radius, radius)
@@ -60,52 +60,53 @@ const createSphere = (radius, position) =>
 
     const body = new CANNON.Body({
         mass: 1,
-        position: new CANNON.Vec3(0, 1.5, 0),
+        position: new CANNON.Vec3(0, 0, 0),
         shape: shape,
         material: defaultMaterial
     })
 
     body.position.copy(position)
     world.addBody(body)
-    body.applyLocalForce(new CANNON.Vec3(-0.5, 0, 0), body.position)
+    body.applyLocalForce(new CANNON.Vec3(150, 0, 0), new CANNON.Vec3(-150, 0, 0))
 
     //更新陣列
     objectsToUpdate.push({
       mesh: mesh,
       body: body
   })
-
-    // Iterate over each object in the array
-    objectsToUpdate.forEach(obj => {
-  // Use GSAP's to() method to tween the position property
-  gsap.to(obj.mesh.position, {
-    x: 0,
-    y: 0,
-    z: 0,
-    duration: 1, // Set the duration of the animation to 1 second
-    delay: 3
-  });
-
-  // gsap.to(obj.body.position, {
-  //   x: 0,
-  //   y: 0,
-  //   z: 0,
-  //   duration: 1
-  // });
-});
-
 }
 
 //物理地板
 const floorShape = new CANNON.Plane()
-const floorBody = new CANNON.Body()
-floorBody.mass = 0
-floorBody.addShape(floorShape)
-world.addBody(floorBody)
-floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5)
-floorBody.position.y = -2.5
-floorBody.material = defaultMaterial
 
+const floorBody = new CANNON.Body()
+const secFloorBody = new CANNON.Body()
+const thirdFloorBody = new CANNON.Body()
+
+floorBody.addShape(floorShape)
+secFloorBody.addShape(floorShape)
+thirdFloorBody.addShape(floorShape)
+
+thirdFloorBody.mass = 0
+secFloorBody.mass = 0
+floorBody.mass = 0
+
+
+world.addBody(floorBody)
+world.addBody(secFloorBody)
+// world.addBody(thirdFloorBody)
+
+floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5)
+secFloorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), Math.PI * .5 )
+thirdFloorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), Math.PI * .5 )
+
+// floorBody.position.y = 10
+// secFloorBody.position.y = -10
+// floorBody.position.x = 0
+floorBody.material = defaultMaterial
+secFloorBody.material = defaultMaterial
+thirdFloorBody.material = defaultMaterial
+thirdFloorBody.position.x = -10
 // Lights
 const directionalLight = new THREE.DirectionalLight('#ffffff', 1)
 directionalLight.position.set(1,2,0)
@@ -136,7 +137,7 @@ window.addEventListener('resize', () =>
 const cameraGroup = new THREE.Group()
 scene.add(cameraGroup)
 const camera = new THREE.PerspectiveCamera(35, sizes.width / sizes.height, 0.1, 100)
-camera.position.z = 6
+camera.position.z = 10
 cameraGroup.add(camera)
 
 // Renderer
@@ -162,7 +163,7 @@ const tick = () =>
     {
         object.mesh.position.copy(object.body.position)
     }
-    createSphere(renderNumber(1,0.1,0.01), { x:renderNumber(1,-1,0.1), y: 1.5, z: renderNumber(0,-10,1) })
+    createSphere(renderNumber(1,0.1,0.01), { x:renderNumber(1,-1,0.1), y: 3, z: 0})
     // Render
     renderer.render(scene, camera)
 
@@ -174,17 +175,15 @@ const tick = () =>
 const bottomAnimate = () => {
   const tl = gsap.timeline()
   tl.from(".cone-line",{
+    scale: 1.3,
     opacity: 0,
     xPercent: 100,
     stagger: .1,
     delay: 5,
-    onComplete: self => tick()
-  })
-  .to(".cone-line",{
-    y: 10,
-    repeat: -1,
-    repeatDelay: 1,
-    yoyo: true,
+    onComplete: self => {
+      tick()
+      tl.reverse()
+    },
   })
   return tl
 }
