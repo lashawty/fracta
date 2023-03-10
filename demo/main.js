@@ -4,7 +4,10 @@ import * as THREE from 'three'
 import * as dat from 'lil-gui'
 import gsap from 'gsap'
 import CANNON from 'cannon'
+import {Observer} from 'gsap/Observer'
+import { ScrollToPlugin } from 'gsap/all'
 
+gsap.registerPlugin(Observer, ScrollToPlugin)
 //進場動畫
 // entry()
 
@@ -67,7 +70,7 @@ const createSphere = (radius, position) =>
 
     body.position.copy(position)
     world.addBody(body)
-    body.applyLocalForce(new CANNON.Vec3(0, 0, 10), new CANNON.Vec3(100, -100, 10))
+    // body.applyLocalForce(new CANNON.Vec3(0, 0, 10), new CANNON.Vec3(100, -100, 10))
 
     //更新陣列
     objectsToUpdate.push({
@@ -183,7 +186,7 @@ const tick = () =>
     {
         object.mesh.position.copy(object.body.position)
     }
-    createSphere(renderNumber(1,0.1,0.01), { x:renderNumber(1,-1,0.1), y: 10, z: -10})
+    createSphere(renderNumber(1,0.1,0.01), { x:renderNumber(1,-1,0.1), y: 5, z: -10})
     // Render
     renderer.render(scene, camera)
 
@@ -191,7 +194,7 @@ const tick = () =>
     window.requestAnimationFrame(tick)
 }
 
-tick()
+// tick()
 const bottomAnimate = () => {
   const tl = gsap.timeline()
   tl.from(".cone-line",{
@@ -199,28 +202,53 @@ const bottomAnimate = () => {
     opacity: 0,
     xPercent: 100,
     stagger: .1,
-    // delay: 5,
-    onComplete: self => {
-      // floorBody.position.y = -20
-      // tick()
-      // tl.reverse()
-    },
+    // delay: 3,
   })
   .to(boxBody.position, {
-    z: -30,
+    z: 15,
   })
   .to(fourFloorBody.position,{
-    x: -10
+    // x: -20
   })
   .to(thirdFloorBody.position,{
-    x: 0,
+    // x: 20,
+  })
+  .to(".cone-line",{
+    y: -50,
+    repeat: 2,
+    yoyo: true,
     onComplete: self=>{
-      world.remove(boxBody)
-      world.gravity.set(15, 1, 10)
+      world.remove(secFloorBody)
+      world.gravity.set(-1, 1, 1)
+      tl.reverse()
     }
   })
   return tl
 }
 
-bottomAnimate()
 
+const sectionBottom = () => {
+  const tl = gsap.timeline()
+  tl.from('.section-bottom', {
+    // yPercent: 100,
+    zIndex: -1
+  })
+  .to(window, {
+    duration: 1,
+    scrollTo: '.section-bottom',
+    onComplete: self => {
+      tick()
+      bottomAnimate()
+    }
+  })
+
+  return tl
+}
+
+Observer.create({
+  target: '.section-top',         // can be any element (selector text is fine)
+  type: "wheel,touch",    // c
+  onDown: () => {
+    sectionBottom().play()
+  },
+});
