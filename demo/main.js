@@ -9,7 +9,7 @@ gsap.registerPlugin(ScrollTrigger)
 
 //加入物理世界
 const world = new CANNON.World()
-world.gravity.set(0, -3, 0) //地心引力
+world.gravity.set(1, -3, -1) //地心引力
 
 //物理 材質
 const defaultMaterial = new CANNON.Material('default')
@@ -32,11 +32,8 @@ const renderNumber = (max, min, delta) => {
 const canvas = document.querySelector('canvas.webgl')
 const scene = new THREE.Scene()
 
-// 物件
-
-
 //球
-const objectsToUpdate = []
+const objectsToUpdate = [] //球體陣列
 const sphereGeometry = new THREE.SphereGeometry(1, 32, 32)
 const sphereMaterial = new THREE.MeshBasicMaterial({
   color: '#003F97',
@@ -45,7 +42,7 @@ const sphereMaterial = new THREE.MeshBasicMaterial({
 //產生球
 const createSphere = (radius, position) =>
 {   
-    if (objectsToUpdate.length >= 10) return
+    if (objectsToUpdate.length >= 10) return //最多十顆球
     // Three
     const mesh = new THREE.Mesh(sphereGeometry, sphereMaterial)
     mesh.scale.set(radius, radius, radius)
@@ -64,9 +61,7 @@ const createSphere = (radius, position) =>
 
     body.position.copy(position)
     world.addBody(body)
-    // body.applyLocalForce(new CANNON.Vec3(0, 0, 10), new CANNON.Vec3(100, -100, 10))
-
-    //更新陣列
+    //產生球體存入陣列
     objectsToUpdate.push({
       mesh: mesh,
       body: body
@@ -77,12 +72,12 @@ const createSphere = (radius, position) =>
 const floorShape = new CANNON.Plane()
 const boxShape = new CANNON.Box(new CANNON.Vec3(1,1000,1))
 
-const floorBody = new CANNON.Body()
-const secFloorBody = new CANNON.Body()
-const thirdFloorBody = new CANNON.Body()
-const fourFloorBody = new CANNON.Body()
-const fifFloorBody = new CANNON.Body()
-const boxBody = new CANNON.Body()
+const floorBody = new CANNON.Body() //物理地板
+const secFloorBody = new CANNON.Body() //物理天花板
+const thirdFloorBody = new CANNON.Body() //物理右側牆壁
+const fourFloorBody = new CANNON.Body() //物理左側
+const fifFloorBody = new CANNON.Body() //z軸牆壁後方
+const boxBody = new CANNON.Body() //z軸牆壁前方
 
 floorBody.addShape(floorShape)
 secFloorBody.addShape(floorShape)
@@ -122,19 +117,18 @@ thirdFloorBody.material = defaultMaterial
 fourFloorBody.material = defaultMaterial
 fifFloorBody.material = defaultMaterial
 
-
-
-// Lights
+// 燈光
 const directionalLight = new THREE.DirectionalLight('#ffffff', 1)
 directionalLight.position.set(1,2,0)
 scene.add(directionalLight)
 
-// Size
+// canvas 尺寸
 const sizes = {
   width: window.innerWidth,
   height: window.innerHeight
 }
 
+// canvas rwd
 window.addEventListener('resize', () =>
 {
     // Update sizes
@@ -184,7 +178,6 @@ const tick = () =>
     // Render
     renderer.render(scene, camera)
 
-    // Call tick again on the next frame
     window.requestAnimationFrame(tick)
 }
 
