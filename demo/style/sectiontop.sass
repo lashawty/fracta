@@ -1,7 +1,66 @@
 .section-top
-  width: 100vw
-  height: 100vh
+  padding: 12.5vw 30px 
   position: relative
+  width: 100vw
+  // height: 100vh
+  text-align: center
+  +rwdmax(1440)
+    padding-top: 200px
+  +rwdmax(992)
+    padding: 160px 30px 260px
   .bg
     display: block
-    // transform: translate(-7.8125vw, 0)
+    position: absolute
+    z-index: -1
+    top: 0
+    left: 0
+    width: fit-content
+    #eKvzgwVAoP81
+      display: block
+      width: max(76.82vw, 655px)
+    #egSLxOhtEAi1
+      display: none
+      width: 655px
+    +rwdmax(992)
+      #eKvzgwVAoP81
+        display: none
+      #egSLxOhtEAi1
+        display: block
+    +rwdmax(575)
+      top: 60px
+      #egSLxOhtEAi1
+        width: 100vw
+  .text-wrap
+    margin: 0 auto
+    max-width: 845px
+    .title
+      margin-top: 10px
+    .sub
+      margin-top: 20px
+    .text
+      margin: 165px auto 0 auto
+      max-width: 485px
+      color: #EDEDED
+      +rwdmax(1200)
+        margin-top: 115px
+.arrow-wrap
+  position: absolute
+  right: 6.25vw
+  bottom: 13vw
+  width: fit-content
+  cursor: pointer
+  +rwdmax(992)
+    right: 25px
+    bottom: 50px
+  .arrow
+    position: absolute
+    top: 50%
+    left: 50%
+    transform: translate(-50%, -50%)
+  .circle
+    transition: transform 1000s
+  &:hover
+    .circle
+      transform: rotate(10800deg)
+    .arrow
+      animation: pop-down 2s infinite

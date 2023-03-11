@@ -1,17 +1,11 @@
 import './style.sass'
 import { entry } from './js/entry'
+import { scrollUpDown } from './js/arrow'
 import * as THREE from 'three'
-import * as dat from 'lil-gui'
 import gsap from 'gsap'
 import CANNON from 'cannon'
-import {Observer} from 'gsap/Observer'
-import { ScrollToPlugin } from 'gsap/all'
-
-gsap.registerPlugin(Observer, ScrollToPlugin)
-//進場動畫
-// entry()
-
-//下方動畫
+import { ScrollTrigger } from 'gsap/all'
+gsap.registerPlugin(ScrollTrigger)
 
 //加入物理世界
 const world = new CANNON.World()
@@ -118,7 +112,7 @@ fourFloorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, -1, 0), Math.PI * -
 floorBody.position.y = -6
 secFloorBody.position.y = 6
 thirdFloorBody.position.x = 10
-fourFloorBody.position.x = -1
+fourFloorBody.position.x = -10
 fifFloorBody.position.z = -30
 boxBody.position.z = 10
 
@@ -194,24 +188,17 @@ const tick = () =>
     window.requestAnimationFrame(tick)
 }
 
-// tick()
+
 const bottomAnimate = () => {
   const tl = gsap.timeline()
-  tl.from(".cone-line",{
-    scale: 1.3,
-    opacity: 0,
-    xPercent: 100,
+  tl.to(".cone-line",{
+    opacity: 1,
+    xPercent: 0,
     stagger: .1,
-    // delay: 3,
+    delay: 2
   })
   .to(boxBody.position, {
     z: 15,
-  })
-  .to(fourFloorBody.position,{
-    // x: -20
-  })
-  .to(thirdFloorBody.position,{
-    // x: 20,
   })
   .to(".cone-line",{
     y: -50,
@@ -220,35 +207,50 @@ const bottomAnimate = () => {
     onComplete: self=>{
       world.remove(secFloorBody)
       world.gravity.set(-1, 1, 1)
-      tl.reverse()
     }
   })
   return tl
 }
 
+// init
+entry()
+scrollUpDown()
+
+gsap.set(".section-bottom .entry-text",{
+  opacity: 0,
+  y: -20,
+})
+gsap.set(".arrow-up",{
+  opacity: 0,
+  x: 20,
+})
+gsap.set(".cone-line", {
+  opacity: 0,
+  xPercent: 100,
+})
 
 const sectionBottom = () => {
   const tl = gsap.timeline()
-  tl.from('.section-bottom', {
-    // yPercent: 100,
-    zIndex: -1
+  tl
+  .to(".section-bottom .entry-text",{
+    opacity: 1,
+    y: 0,
+    stagger: .2,
   })
-  .to(window, {
-    duration: 1,
-    scrollTo: '.section-bottom',
+  .to(".arrow-up",{
+    opacity: 1,
+    x: 0,
     onComplete: self => {
       tick()
       bottomAnimate()
     }
   })
-
   return tl
 }
 
-Observer.create({
-  target: '.section-top',         // can be any element (selector text is fine)
-  type: "wheel,touch",    // c
-  onDown: () => {
-    sectionBottom().play()
-  },
+gsap.from(".section-bottom", {
+  scrollTrigger: ".section-bottom",
+  opacity: 0,
+  duration: 1,
+  onComplete: self => sectionBottom()
 });
