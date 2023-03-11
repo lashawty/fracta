@@ -38,7 +38,7 @@ const scene = new THREE.Scene()
 //球
 const objectsToUpdate = []
 const sphereGeometry = new THREE.SphereGeometry(1, 32, 32)
-const sphereMaterial = new THREE.MeshPhongMaterial({
+const sphereMaterial = new THREE.MeshBasicMaterial({
   color: '#003F97',
 })
 
@@ -180,7 +180,7 @@ const tick = () =>
     {
         object.mesh.position.copy(object.body.position)
     }
-    createSphere(renderNumber(1,0.1,0.01), { x:renderNumber(1,-1,0.1), y: 5, z: -10})
+    createSphere(renderNumber(1,0.1,0.01), { x:renderNumber(5,-5,0.5), y: 15, z: -10})
     // Render
     renderer.render(scene, camera)
 
@@ -206,7 +206,7 @@ const bottomAnimate = () => {
     yoyo: true,
     onComplete: self=>{
       world.remove(secFloorBody)
-      world.gravity.set(-1, 1, 1)
+      world.gravity.set(0, 0.2, -10)
     }
   })
   return tl
@@ -249,7 +249,7 @@ const sectionBottom = () => {
 }
 
 gsap.from(".section-bottom", {
-  scrollTrigger: ".section-bottom",
+  scrollTrigger: ".scrolltrigger",
   opacity: 0,
   duration: 1,
   onComplete: self => sectionBottom()
